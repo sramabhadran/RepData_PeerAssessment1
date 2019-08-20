@@ -38,7 +38,8 @@ output:
 
 ### Loading and preprocessing the data
 
-```{r, echo=TRUE}
+
+```r
 ## Set working directory
 
 mywd <- "C:/Users/SAR/Documents/Reproducible Research/Course Project 1"
@@ -52,7 +53,6 @@ unzip("./data.zip")
 ## Read in the data
 activity_raw <- read.csv("./activity.csv", header = TRUE)
 activity_raw$date <- as.Date(activity_raw$date)
-
 ```
 
 
@@ -60,7 +60,8 @@ activity_raw$date <- as.Date(activity_raw$date)
 ### Part 1: What is mean total number of steps taken per day?
 
 
-```{r, echo=TRUE}
+
+```r
 ## Code chunk for Part 1 - Go back and make it look nicer later
 totalSteps <- aggregate(activity_raw$steps, list(Group.date = activity_raw$date), FUN = sum)
 
@@ -68,44 +69,71 @@ totalSteps <- aggregate(activity_raw$steps, list(Group.date = activity_raw$date)
 ## median of the total number of steps taken per day.
 
 hist(totalSteps$x, main = "Figure 1: Histogram of Total Daily Steps", xlab = "Total Daily Steps")
+```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
+```r
 ## Still have not removed NAs from data, so will need to do so for mean/median
 mean(totalSteps$x, na.rm = TRUE)
-median(totalSteps$x, na.rm = TRUE)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
+median(totalSteps$x, na.rm = TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 
 ### Part 2: What is the average daily activity pattern?
 
 
-```{r, echo=TRUE}
+
+```r
 ## Code chunk for Part 2 - remove RM from data set first
 ar_part2 <- subset(activity_raw, is.na(steps) == FALSE)
 
 ## Calculate and plot mean steps as a time-series
 meanStepsByInterval <- aggregate(ar_part2$steps, list(Group.interval = ar_part2$interval), FUN = mean)
 plot(meanStepsByInterval$Group.interval, meanStepsByInterval$x, type = "l", main = "Figure 2: Average Steps by Time Interval", xlab = "Time Interval", ylab = "Average Number of Steps" )
+```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+```r
 ## Now which 5-minute interval contains the most steps on average?
 
 meanStepsByInterval[(which.max(meanStepsByInterval$x)), 1]
+```
 
-
+```
+## [1] 835
 ```
 
 
 ### Part 3: Imputing missing values.
 
-```{r, echo=TRUE}
+
+```r
 ## Start by creating a duplicate copy of raw data set
 ar_imputed <- activity_raw
 
 ## Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs).
 
 nrow(ar_imputed[is.na(ar_imputed$steps), ])
+```
 
+```
+## [1] 2304
+```
 
+```r
 ## Data imputation - go through and set NAs to previously calculated means
 
 for (i in 1:nrow(ar_imputed))
@@ -129,18 +157,32 @@ for (i in 1:nrow(ar_imputed))
 
 totalStepsImputed <- aggregate(ar_imputed$steps, list(Group.date = ar_imputed$date), FUN = sum)
 hist(totalStepsImputed$x, main = "Figure 3: Histogram of Total Daily Steps (Imputed Data)", xlab = "Total Daily Steps")
+```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
+```r
 ## Report median and mean from imputed data set - by now should not have any NAs left
 
 mean(totalStepsImputed$x, na.rm = FALSE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(totalStepsImputed$x, na.rm = FALSE)
+```
 
-
+```
+## [1] 10766.19
 ```
 
 ### Part 4: Are there differences in activity patterns between weekdays and weekends?
 
-```{r, echo=TRUE}
+
+```r
 ## Create a new factor variable in the dataset with two levels – “weekday” and “weekend”
 ## indicating whether a given date is a weekday or weekend day. For this part 
 ## the weekdays() function may be of some help here.
@@ -162,5 +204,6 @@ meanStepsInt_Imputed <- aggregate(.~interval + weekday, ar_imputed, mean)
 library(lattice)
 p <- xyplot(steps ~ interval | weekday, data = meanStepsInt_Imputed, type = "l", layout = c(1,2), main = "Figure 4: Daily Activity, Weekend vs. Weekday", xlab = "Time Interval", ylab = "Average Number of Steps")
 print(p)
-
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
